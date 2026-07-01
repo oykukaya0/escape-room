@@ -1,122 +1,193 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [seconds, setSeconds] = useState(47 * 60 + 23);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((prev) => (prev > 0 ? prev - 1 : 47 * 60 + 23));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const rooms = [
+    {
+      icon: "🏛️",
+      tag: "En popüler",
+      title: "Müze Cinayeti",
+      image: "/src/assets/muze-cinayeti.png",
+      time: "60 dk",
+      players: "2–6 oyuncu",
+      stars: "★★★★☆",
+    },
+    {
+      icon: "🚀",
+      tag: "Yeni",
+      title: "Uzay İstasyonu",
+      image: "/src/assets/uzay-istasyonu.png",
+      time: "75 dk",
+      players: "3–8 oyuncu",
+      stars: "★★★★★",
+    },
+    {
+      icon: "🌙",
+      tag: "Çok zor",
+      title: "Vampir Şatosu",
+      image: "/src/assets/vampir-satosu.png",
+      time: "90 dk",
+      players: "2–5 oyuncu",
+      stars: "★★★★★",
+    },
+    {
+      icon: "🗺️",
+      tag: "Kolay",
+      title: "Kayıp Hazine",
+      image: "/src/assets/kayip-hazine.png",
+      time: "45 dk",
+      players: "2–4 oyuncu",
+      stars: "★★★☆☆",
+    },
+  ];
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+      <nav>
+        <div className="logo">
+          ESCAPE <span>ROOMS</span>
+        </div>
+
+        <ul className="nav-links">
+          <li>Ana Sayfa</li>
+          <li>Odalar</li>
+          <li>Liderlik</li>
+          <li>Nasıl Oynanır</li>
+        </ul>
+
+        <button className="nav-login">Giriş Yap</button>
+      </nav>
+
+      <main className="hero">
+        <section className="hero-content">
+          <h1 className="hero-title">
+            <span className="hero-title-white">GİZEMİ ÇÖZ.</span>
+            <span className="hero-title-gold">KAÇIŞI TAMAMLA.</span>
+          </h1>
+
+          <p>
+            Arkadaşlarınla birlikte ipuçlarını keşfet, şifreleri çöz ve süre
+            dolmadan odadan kaç.
+          </p>
+
+          <div className="hero-buttons">
+            <button className="primary-btn">👥 Odaya Katıl</button>
+            <button className="secondary-btn">▷ Nasıl Oynanır?</button>
+          </div>
+        </section>
+
+        <section className="rooms-section compact">
+          <p className="section-label">🏆 POPÜLER ODALAR</p>
+
+          <div className="rooms-grid">
+            {rooms.map((room) => (
+              <div className="room-card" key={room.title}>
+                <div
+                  className="room-image"
+                  style={{ backgroundImage: `url(${room.image})` }}
+                ></div>
+
+                <h3>{room.title}</h3>
+
+                <div className="room-meta">
+                  <span>🕒 {room.time}</span>
+                  <span>👥 {room.players}</span>
+                </div>
+
+                <div className="stars">
+                  <span className="difficulty-text">Zorluk:</span>
+                  <span className="star-text">{room.stars}</span>
+                </div>
+
+                <button>Detay</button>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <section className="stats">
+        <div>
+          <strong>12+</strong>
+          <p>Benzersiz oda</p>
         </div>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+          <strong>48k</strong>
+          <p>Toplam oyuncu</p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div>
+          <strong>%34</strong>
+          <p>Kaçış başarı oranı</p>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+        <div>
+          <strong>8</strong>
+          <p>Zorluk seviyesi</p>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <section className="rooms-section">
+        <p className="section-label">Popüler odalar</p>
+        <h2>Hangi gizemi çözeceksin?</h2>
+
+        <div className="rooms-grid">
+          {rooms.map((room) => (
+            <div className="room-card" key={room.title}>
+              <div className="room-icon">{room.icon}</div>
+              <span className="room-tag">{room.tag}</span>
+
+              <h3>{room.title}</h3>
+
+              <div className="room-meta">
+                <span>🕒 {room.time}</span>
+                <span>👥 {room.players}</span>
+              </div>
+
+              <div className="stars">{room.stars}</div>
+
+              <button>Detay →</button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="how-section">
+        <p className="section-label">Nasıl oynanır</p>
+        <h2>Üç adımda başla</h2>
+
+        <div className="steps">
+          <div>
+            <span>1</span>
+            <h3>Oda seç</h3>
+            <p>Zorluk seviyene göre istediğin odayı seç.</p>
+          </div>
+
+          <div>
+            <span>2</span>
+            <h3>Arkadaşlarını davet et</h3>
+            <p>Oda kodunu paylaş ve arkadaşlarınla aynı lobiye gir.</p>
+          </div>
+
+          <div>
+            <span>3</span>
+            <h3>İpuçlarını çöz</h3>
+            <p>Şifreleri bul, kapıyı aç ve süre dolmadan kaç.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>© 2026 Escape Rooms. Tüm hakları saklıdır.</footer>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
