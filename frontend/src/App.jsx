@@ -4,6 +4,14 @@ import "./App.css";
 function App() {
   const [seconds, setSeconds] = useState(47 * 60 + 23);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [joinModalOpen, setJoinModalOpen] = useState(false);
+  const [playerName, setPlayerName] = useState("");
+  const [roomCode, setRoomCode] = useState("");
+  const [joinError, setJoinError] = useState("");
+  /*joinModalOpen: Katılma penceresini açıp kapatır.
+  playerName: Yazılan oyuncu adını tutar.
+  roomCode: Yazılan oda kodunu tutar.
+  joinError: Eksik bilgi varsa uyarı gösterir.*/
   useEffect(() => {
     const interval = setInterval(() => {
       setSeconds((prev) => (prev > 0 ? prev - 1 : 47 * 60 + 23));
@@ -62,6 +70,28 @@ function App() {
       "Eski bir korsan haritasının parçalarını birleştirin, şifreleri çözün ve kayıp hazineye herkesten önce ulaşın.",
   },
 ];
+const handleJoinRoom = (event) => {
+  event.preventDefault();
+
+  if (!playerName.trim() || !roomCode.trim()) {
+    setJoinError("Lütfen oyuncu adını ve oda kodunu gir.");
+    return;
+  }
+
+  if (roomCode.trim().length < 6) {
+    setJoinError("Oda kodu en az 6 karakter olmalıdır.");
+    return;
+  }
+
+  setJoinError("");
+  alert(
+    `${playerName}, ${roomCode.toUpperCase()} kodlu odaya katılma isteğin alındı!`
+  );
+
+  setJoinModalOpen(false);
+  setPlayerName("");
+  setRoomCode("");
+};
 
   return (
     <>
@@ -104,8 +134,25 @@ function App() {
           </p>
 
           <div className="hero-buttons">
-            <button className="primary-btn">👥 Odaya Katıl</button>
-            <button className="secondary-btn">▷ Nasıl Oynanır?</button>
+            <button
+              className="primary-btn"
+              onClick={() => {
+                setJoinError("");
+                setJoinModalOpen(true);
+              }}
+            >
+              👥 Odaya Katıl
+            </button>
+            <button
+              className="secondary-btn"
+              onClick={() =>
+                document
+                  .getElementById("nasil-oynanir")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              ▷ Nasıl Oynanır?
+            </button>
           </div>
         </section>
 
@@ -263,6 +310,77 @@ function App() {
           Bu Odayı Seç
         </button>
       </div>
+    </div>
+  </div>
+)}
+{joinModalOpen && (
+  <div
+    className="modal-overlay"
+    onClick={() => setJoinModalOpen(false)}
+  >
+    <div
+      className="join-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        className="modal-close"
+        onClick={() => setJoinModalOpen(false)}
+        aria-label="Pencereyi kapat"
+      >
+        ×
+      </button>
+
+      <div className="join-modal-header">
+        <span>ÇOK OYUNCULU OYUN</span>
+        <h2>Odaya Katıl</h2>
+        <p>
+          Arkadaşının paylaştığı oda kodunu girerek lobiye katıl.
+        </p>
+      </div>
+
+      <form className="join-form" onSubmit={handleJoinRoom}>
+        <label htmlFor="player-name">Oyuncu adı</label>
+
+        <input
+          id="player-name"
+          type="text"
+          placeholder="İlayda"
+          value={playerName}
+          onChange={(event) => setPlayerName(event.target.value)}
+          autoComplete="off"
+        />
+
+        <label htmlFor="room-code">Oda kodu</label>
+
+        <input
+          id="room-code"
+          className="room-code-input"
+          type="text"
+          placeholder="Örneğin: MUSE42"
+          value={roomCode}
+          maxLength={8}
+          onChange={(event) =>
+            setRoomCode(
+              event.target.value
+                .toUpperCase()
+                .replace(/[^A-Z0-9]/g, "")
+            )
+          }
+          autoComplete="off"
+        />
+
+        {joinError && (
+          <p className="form-error">{joinError}</p>
+        )}
+
+        <button className="join-submit-btn" type="submit">
+          Odaya Katıl
+        </button>
+      </form>
+
+      <p className="join-help">
+        Oda kodun yok mu? Önce bir oda seçerek yeni oda oluşturabilirsin.
+      </p>
     </div>
   </div>
 )}
