@@ -26,6 +26,16 @@ function App() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [myRoomsModalOpen, setMyRoomsModalOpen] = useState(false);
   const [createdRooms, setCreatedRooms] = useState([]);
+  const [statsStarted, setStatsStarted] = useState(false);
+
+  const [animatedStats, setAnimatedStats] = useState({
+    scenarios: 0,
+    minDuration: 0,
+    maxDuration: 0,
+    minPlayers: 0,
+    maxPlayers: 0,
+    difficulties: 0,
+  });
   /*joinModalOpen: Katılma penceresini açıp kapatır.
   playerName: Yazılan oyuncu adını tutar.
   roomCode: Yazılan oda kodunu tutar.
@@ -37,6 +47,89 @@ function App() {
 
     return () => clearInterval(interval);
   }, []);
+  useEffect(() => {
+  const revealElements = document.querySelectorAll(".reveal");
+
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+
+          if (entry.target.classList.contains("stats")) {
+            setStatsStarted(true);
+          }
+
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.18,
+    }
+  );
+
+  revealElements.forEach((element) => {
+    revealObserver.observe(element);
+  });
+
+  return () => revealObserver.disconnect();
+}, []);
+
+useEffect(() => {
+  if (!statsStarted) {
+    return;
+  }
+
+  const duration = 1300;
+  const startTime = performance.now();
+  let animationFrame;
+
+  const targetValues = {
+    scenarios: 4,
+    minDuration: 45,
+    maxDuration: 90,
+    minPlayers: 2,
+    maxPlayers: 8,
+    difficulties: 3,
+  };
+
+  const animateStats = (currentTime) => {
+    const elapsedTime = currentTime - startTime;
+    const progress = Math.min(elapsedTime / duration, 1);
+
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+    setAnimatedStats({
+      scenarios: Math.round(
+        targetValues.scenarios * easedProgress
+      ),
+      minDuration: Math.round(
+        targetValues.minDuration * easedProgress
+      ),
+      maxDuration: Math.round(
+        targetValues.maxDuration * easedProgress
+      ),
+      minPlayers: Math.round(
+        targetValues.minPlayers * easedProgress
+      ),
+      maxPlayers: Math.round(
+        targetValues.maxPlayers * easedProgress
+      ),
+      difficulties: Math.round(
+        targetValues.difficulties * easedProgress
+      ),
+    });
+
+    if (progress < 1) {
+      animationFrame = requestAnimationFrame(animateStats);
+    }
+  };
+
+  animationFrame = requestAnimationFrame(animateStats);
+
+  return () => cancelAnimationFrame(animationFrame);
+}, [statsStarted]);
 
   const rooms = [
   {
@@ -343,7 +436,7 @@ const deleteCreatedRoom = (roomCode) => {
       </nav>
 
       <main className="hero" id="ana-sayfa">
-        <section className="hero-content">
+        <section className="hero-content hero-enter">
           <h1 className="hero-title">
             <span className="hero-title-white">GİZEMİ ÇÖZ.</span>
             <span className="hero-title-gold">KAÇIŞI TAMAMLA.</span>
@@ -377,7 +470,10 @@ const deleteCreatedRoom = (roomCode) => {
           </div>
         </section>
 
-        <section className="rooms-section compact" id="odalar">
+        <section
+          className="rooms-section compact hero-cards-enter"
+          id="odalar"
+        >
           <p className="section-label">🏆 POPÜLER ODALAR</p>
 
           <div className="rooms-grid">
@@ -407,28 +503,32 @@ const deleteCreatedRoom = (roomCode) => {
         </section>
       </main>
 
-      <section className="stats">
+      <section className="stats reveal">
         <div>
-          <strong>4</strong>
+          <strong>{animatedStats.scenarios}</strong>
           <p>Farklı senaryo</p>
         </div>
 
         <div>
-          <strong>45–90 dk</strong>
+          <strong>
+            {animatedStats.minDuration}–{animatedStats.maxDuration} dk
+          </strong>
           <p>Oyun süresi</p>
         </div>
 
         <div>
-          <strong>2–8</strong>
+          <strong>
+            {animatedStats.minPlayers}–{animatedStats.maxPlayers}
+          </strong>
           <p>Oyuncu kapasitesi</p>
         </div>
 
         <div>
-          <strong>3</strong>
+          <strong>{animatedStats.difficulties}</strong>
           <p>Zorluk seviyesi</p>
         </div>
       </section>
-      <section className="rooms-section">
+      <section className="rooms-section reveal reveal-left">
         <p className="section-label">Popüler odalar</p>
         <h2>Hangi gizemi çözeceksin?</h2>
 
@@ -453,7 +553,10 @@ const deleteCreatedRoom = (roomCode) => {
         </div>
       </section>
 
-      <section className="how-section" id="nasil-oynanir">
+      <section
+        className="how-section reveal reveal-left"
+        id="nasil-oynanir"
+      >
         <p className="section-label">Nasıl oynanır</p>
         <h2>Üç adımda başla</h2>
 
