@@ -23,6 +23,9 @@ function App() {
   const [authError, setAuthError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [myRoomsModalOpen, setMyRoomsModalOpen] = useState(false);
+  const [createdRooms, setCreatedRooms] = useState([]);
   /*joinModalOpen: Katılma penceresini açıp kapatır.
   playerName: Yazılan oyuncu adını tutar.
   roomCode: Yazılan oda kodunu tutar.
@@ -137,6 +140,18 @@ const handleCreateRoom = (event) => {
     return;
   }
 
+  const newRoom = {
+    room: createRoom,
+    owner: creatorName.trim(),
+    code: generatedRoomCode,
+    createdAt: new Date().toLocaleDateString("tr-TR"),
+  };
+
+  setCreatedRooms((previousRooms) => [
+    ...previousRooms,
+    newRoom,
+  ]);
+
   setRoomCreated(true);
 };
 
@@ -209,6 +224,34 @@ const handleAuthSubmit = (event) => {
 const handleLogout = () => {
   setCurrentUser(null);
   setUserMenuOpen(false);
+  setProfileModalOpen(false);
+  setMyRoomsModalOpen(false);
+};
+
+const returnToLobby = (roomItem) => {
+  setGeneratedRoomCode(roomItem.code);
+
+  setLobbyData({
+    room: roomItem.room,
+    owner: roomItem.owner,
+    code: roomItem.code,
+  });
+
+  setIsReady(false);
+  setMyRoomsModalOpen(false);
+  setUserMenuOpen(false);
+};
+
+const deleteCreatedRoom = (roomCode) => {
+  setCreatedRooms((previousRooms) =>
+    previousRooms.filter(
+      (roomItem) => roomItem.code !== roomCode
+    )
+  );
+
+  if (lobbyData?.code === roomCode) {
+    setLobbyData(null);
+  }
 };
 
   return (
@@ -266,8 +309,24 @@ const handleLogout = () => {
                 <span>{currentUser.email}</span>
               </div>
 
-              <button type="button">Profilim</button>
-              <button type="button">Odalarım</button>
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileModalOpen(true);
+                  setUserMenuOpen(false);
+                }}
+              >
+                Profilim
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMyRoomsModalOpen(true);
+                  setUserMenuOpen(false);
+                }}
+              >
+                Odalarım
+              </button>
 
               <button
                 type="button"
@@ -900,6 +959,210 @@ const handleLogout = () => {
     </div>
   </div>
 )}
+
+{profileModalOpen && currentUser && (
+  <div
+    className="modal-overlay"
+    onClick={() => setProfileModalOpen(false)}
+  >
+    <div
+      className="profile-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        className="modal-close"
+        onClick={() => setProfileModalOpen(false)}
+        aria-label="Pencereyi kapat"
+      >
+        ×
+      </button>
+
+      <div className="profile-header">
+        <div className="profile-avatar">
+          {currentUser.name.charAt(0).toUpperCase()}
+        </div>
+
+        <div>
+          <span>KULLANICI PROFİLİ</span>
+          <h2>{currentUser.name}</h2>
+          <p>{currentUser.email}</p>
+        </div>
+      </div>
+
+      <div className="profile-stats">
+        <div>
+          <strong>{createdRooms.length}</strong>
+          <span>Oluşturulan oda</span>
+        </div>
+
+        <div>
+          <strong>0</strong>
+          <span>Katılınan oda</span>
+        </div>
+
+        <div>
+          <strong>Yeni</strong>
+          <span>Üyelik durumu</span>
+        </div>
+      </div>
+
+      <div className="profile-information">
+        <div>
+          <span>Ad</span>
+          <strong>{currentUser.name}</strong>
+        </div>
+
+        <div>
+          <span>E-posta adresi</span>
+          <strong>{currentUser.email}</strong>
+        </div>
+
+        <div>
+          <span>Hesap türü</span>
+          <strong>Standart kullanıcı</strong>
+        </div>
+      </div>
+
+      <div className="profile-note">
+        <span>ⓘ</span>
+
+        <p>
+          Profil bilgileri şu anda yalnızca bu oturumda
+          saklanmaktadır. Backend eklendiğinde hesabına kalıcı
+          olarak kaydedilecektir.
+        </p>
+      </div>
+
+      <button
+        className="profile-close-button"
+        onClick={() => setProfileModalOpen(false)}
+      >
+        Ana Sayfaya Dön
+      </button>
+    </div>
+  </div>
+)}
+
+{myRoomsModalOpen && currentUser && (
+  <div
+    className="modal-overlay"
+    onClick={() => setMyRoomsModalOpen(false)}
+  >
+    <div
+      className="my-rooms-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        className="modal-close"
+        onClick={() => setMyRoomsModalOpen(false)}
+        aria-label="Pencereyi kapat"
+      >
+        ×
+      </button>
+
+      <div className="my-rooms-heading">
+        <span>ODA YÖNETİMİ</span>
+        <h2>Odalarım</h2>
+
+        <p>
+          Oluşturduğun odaları görüntüleyebilir ve lobilerine
+          geri dönebilirsin.
+        </p>
+      </div>
+
+      {createdRooms.length === 0 ? (
+        <div className="empty-rooms-state">
+          <div>🔑</div>
+          <h3>Henüz bir odan yok</h3>
+
+          <p>
+            Bir senaryo seçip yeni oda oluşturduğunda burada
+            görüntülenecek.
+          </p>
+
+          <button
+            onClick={() => {
+              setMyRoomsModalOpen(false);
+
+              document
+                .getElementById("odalar")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            Odaları İncele
+          </button>
+        </div>
+      ) : (
+        <div className="my-rooms-list">
+          {createdRooms.map((roomItem) => (
+            <div
+              className="my-room-item"
+              key={roomItem.code}
+            >
+              <div
+                className="my-room-image"
+                style={{
+                  backgroundImage: `url(${roomItem.room.image})`,
+                }}
+              />
+
+              <div className="my-room-information">
+                <div className="my-room-title-row">
+                  <div>
+                    <span>{roomItem.room.difficulty}</span>
+                    <h3>{roomItem.room.title}</h3>
+                  </div>
+
+                  <span className="room-active-badge">
+                    Aktif
+                  </span>
+                </div>
+
+                <div className="my-room-details">
+                  <span>
+                    Oda kodu:
+                    <strong>{roomItem.code}</strong>
+                  </span>
+
+                  <span>
+                    Oda sahibi:
+                    <strong>{roomItem.owner}</strong>
+                  </span>
+
+                  <span>
+                    Oluşturulma:
+                    <strong>{roomItem.createdAt}</strong>
+                  </span>
+                </div>
+
+                <div className="my-room-actions">
+                  <button
+                    className="return-lobby-button"
+                    onClick={() =>
+                      returnToLobby(roomItem)
+                    }
+                  >
+                    Lobiye Dön
+                  </button>
+
+                  <button
+                    className="delete-room-button"
+                    onClick={() =>
+                      deleteCreatedRoom(roomItem.code)
+                    }
+                  >
+                    Odayı Sil
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
       <footer>© 2026 Escape Rooms. Tüm hakları saklıdır.</footer>
     </>
   );
