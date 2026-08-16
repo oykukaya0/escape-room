@@ -8,6 +8,11 @@ function App() {
   const [playerName, setPlayerName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [joinError, setJoinError] = useState("");
+  const [createRoom, setCreateRoom] = useState(null);
+  const [creatorName, setCreatorName] = useState("");
+  const [generatedRoomCode, setGeneratedRoomCode] = useState("");
+  const [roomCreated, setRoomCreated] = useState(false);
+  const [copyMessage, setCopyMessage] = useState("");
   /*joinModalOpen: Katılma penceresini açıp kapatır.
   playerName: Yazılan oyuncu adını tutar.
   roomCode: Yazılan oda kodunu tutar.
@@ -91,6 +96,47 @@ const handleJoinRoom = (event) => {
   setJoinModalOpen(false);
   setPlayerName("");
   setRoomCode("");
+};
+const generateRoomCode = (room) => {
+  const roomPrefixes = {
+    "Müze Cinayeti": "MUZE",
+    "Uzay İstasyonu": "UZAY",
+    "Vampir Şatosu": "VAMP",
+    "Kayıp Hazine": "HAZN",
+  };
+
+  const randomNumber = Math.floor(1000 + Math.random() * 9000);
+  const prefix = roomPrefixes[room.title] || "ROOM";
+
+  return `${prefix}${randomNumber}`;
+};
+
+const openCreateRoomModal = (room) => {
+  setSelectedRoom(null);
+  setCreateRoom(room);
+  setCreatorName("");
+  setGeneratedRoomCode(generateRoomCode(room));
+  setRoomCreated(false);
+  setCopyMessage("");
+};
+
+const handleCreateRoom = (event) => {
+  event.preventDefault();
+
+  if (!creatorName.trim()) {
+    return;
+  }
+
+  setRoomCreated(true);
+};
+
+const copyRoomCode = async () => {
+  try {
+    await navigator.clipboard.writeText(generatedRoomCode);
+    setCopyMessage("Kod kopyalandı!");
+  } catch {
+    setCopyMessage("Kod kopyalanamadı.");
+  }
 };
 
   return (
@@ -306,7 +352,10 @@ const handleJoinRoom = (event) => {
 
         <div className="modal-stars">{selectedRoom.stars}</div>
 
-        <button className="create-room-btn">
+        <button
+          className="create-room-btn"
+          onClick={() => openCreateRoomModal(selectedRoom)}
+        >
           Bu Odayı Seç
         </button>
       </div>
@@ -381,6 +430,115 @@ const handleJoinRoom = (event) => {
       <p className="join-help">
         Oda kodun yok mu? Önce bir oda seçerek yeni oda oluşturabilirsin.
       </p>
+    </div>
+  </div>
+)}
+
+{createRoom && (
+  <div
+    className="modal-overlay"
+    onClick={() => setCreateRoom(null)}
+  >
+    <div
+      className="create-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        className="modal-close"
+        onClick={() => setCreateRoom(null)}
+        aria-label="Pencereyi kapat"
+      >
+        ×
+      </button>
+
+      {!roomCreated ? (
+        <>
+          <div className="create-modal-header">
+            <span>YENİ ODA</span>
+            <h2>Oda Oluştur</h2>
+            <p>
+              Takımını kur ve arkadaşlarını oyuna davet et.
+            </p>
+          </div>
+
+          <div className="selected-room-summary">
+            <div
+              className="selected-room-image"
+              style={{
+                backgroundImage: `url(${createRoom.image})`,
+              }}
+            />
+
+            <div>
+              <span>Seçilen senaryo</span>
+              <h3>{createRoom.title}</h3>
+              <p>
+                🕒 {createRoom.time} · 👥 {createRoom.players}
+              </p>
+            </div>
+          </div>
+
+          <form
+            className="create-room-form"
+            onSubmit={handleCreateRoom}
+          >
+            <label htmlFor="creator-name">
+              Oda sahibinin adı
+            </label>
+
+            <input
+              id="creator-name"
+              type="text"
+              placeholder="Örneğin: İlayda"
+              value={creatorName}
+              onChange={(event) =>
+                setCreatorName(event.target.value)
+              }
+              autoComplete="off"
+            />
+
+            <button type="submit">
+              Odayı Oluştur
+            </button>
+          </form>
+        </>
+      ) : (
+        <div className="room-created">
+          <div className="success-icon">✓</div>
+
+          <span>ODA HAZIR</span>
+          <h2>{createRoom.title}</h2>
+
+          <p>
+            Odan oluşturuldu, {creatorName}! Arkadaşlarının
+            katılabilmesi için aşağıdaki kodu paylaş.
+          </p>
+
+          <div className="generated-code">
+            {generatedRoomCode}
+          </div>
+
+          <button
+            className="copy-code-btn"
+            onClick={copyRoomCode}
+          >
+            Kodu Kopyala
+          </button>
+
+          {copyMessage && (
+            <p className="copy-message">{copyMessage}</p>
+          )}
+
+          <button
+            className="go-lobby-btn"
+            onClick={() =>
+              alert("Lobi ekranını sonraki aşamada ekleyeceğiz.")
+            }
+          >
+            Lobiye Git
+          </button>
+        </div>
+      )}
     </div>
   </div>
 )}
