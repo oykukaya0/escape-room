@@ -13,6 +13,8 @@ function App() {
   const [generatedRoomCode, setGeneratedRoomCode] = useState("");
   const [roomCreated, setRoomCreated] = useState(false);
   const [copyMessage, setCopyMessage] = useState("");
+  const [lobbyData, setLobbyData] = useState(null);
+  const [isReady, setIsReady] = useState(false);
   /*joinModalOpen: Katılma penceresini açıp kapatır.
   playerName: Yazılan oyuncu adını tutar.
   roomCode: Yazılan oda kodunu tutar.
@@ -137,6 +139,17 @@ const copyRoomCode = async () => {
   } catch {
     setCopyMessage("Kod kopyalanamadı.");
   }
+};
+
+const openLobby = () => {
+  setLobbyData({
+    room: createRoom,
+    owner: creatorName,
+    code: generatedRoomCode,
+  });
+
+  setIsReady(false);
+  setCreateRoom(null);
 };
 
   return (
@@ -531,14 +544,140 @@ const copyRoomCode = async () => {
 
           <button
             className="go-lobby-btn"
-            onClick={() =>
-              alert("Lobi ekranını sonraki aşamada ekleyeceğiz.")
-            }
+            onClick={openLobby}
           >
             Lobiye Git
           </button>
         </div>
       )}
+    </div>
+  </div>
+)}
+
+{lobbyData && (
+  <div className="lobby-overlay">
+    <div className="lobby-page">
+      <div className="lobby-topbar">
+        <div>
+          <span className="lobby-label">OYUN LOBİSİ</span>
+          <h2>{lobbyData.room.title}</h2>
+        </div>
+
+        <button
+          className="leave-lobby-btn"
+          onClick={() => setLobbyData(null)}
+        >
+          Lobiden Çık
+        </button>
+      </div>
+
+      <div className="lobby-content">
+        <section className="lobby-room-panel">
+          <div
+            className="lobby-room-image"
+            style={{
+              backgroundImage: `url(${lobbyData.room.image})`,
+            }}
+          >
+            <div className="lobby-room-image-overlay">
+              <span>{lobbyData.room.difficulty}</span>
+              <h3>{lobbyData.room.title}</h3>
+              <p>
+                🕒 {lobbyData.room.time} · 👥{" "}
+                {lobbyData.room.players}
+              </p>
+            </div>
+          </div>
+
+          <div className="lobby-code-box">
+            <span>ODA KODU</span>
+            <strong>{lobbyData.code}</strong>
+
+            <button onClick={copyRoomCode}>
+              Kodu Kopyala
+            </button>
+
+            {copyMessage && (
+              <p className="lobby-copy-message">
+                {copyMessage}
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="players-panel">
+          <div className="players-heading">
+            <div>
+              <span>KATILIMCILAR</span>
+              <h3>Oyuncular</h3>
+            </div>
+
+            <strong>1 oyuncu</strong>
+          </div>
+
+          <div className="player-list">
+            <div className="player-item">
+              <div className="player-avatar">
+                {lobbyData.owner
+                  .trim()
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
+
+              <div className="player-info">
+                <strong>{lobbyData.owner}</strong>
+                <span>Oda sahibi</span>
+              </div>
+
+              <div
+                className={
+                  isReady
+                    ? "player-status ready"
+                    : "player-status waiting"
+                }
+              >
+                {isReady ? "Hazır" : "Bekleniyor"}
+              </div>
+            </div>
+
+            <div className="empty-player">
+              <span>+</span>
+              <p>Oyuncu bekleniyor</p>
+            </div>
+
+            <div className="empty-player">
+              <span>+</span>
+              <p>Oyuncu bekleniyor</p>
+            </div>
+          </div>
+
+          <button
+            className={
+              isReady
+                ? "ready-button active"
+                : "ready-button"
+            }
+            onClick={() => setIsReady((prev) => !prev)}
+          >
+            {isReady
+              ? "Hazır Durumundasın ✓"
+              : "Hazırım"}
+          </button>
+        </section>
+      </div>
+
+      <section className="coming-soon-panel">
+        <div>
+          <span>YAKINDA</span>
+          <h3>Oyun deneyimi geliştiriliyor</h3>
+          <p>
+            Arkadaşlarınla birlikte gizemleri çözebileceğin oyun
+            deneyimi yakında burada olacak.
+          </p>
+        </div>
+
+        <button disabled>Oyun Yakında</button>
+      </section>
     </div>
   </div>
 )}
