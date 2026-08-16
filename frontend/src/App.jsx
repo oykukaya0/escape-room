@@ -3,7 +3,7 @@ import "./App.css";
 
 function App() {
   const [seconds, setSeconds] = useState(47 * 60 + 23);
-
+  const [selectedRoom, setSelectedRoom] = useState(null);
   useEffect(() => {
     const interval = setInterval(() => {
       setSeconds((prev) => (prev > 0 ? prev - 1 : 47 * 60 + 23));
@@ -13,43 +13,55 @@ function App() {
   }, []);
 
   const rooms = [
-    {
-      icon: "🏛️",
-      tag: "En popüler",
-      title: "Müze Cinayeti",
-      image: "/src/assets/muze-cinayeti.png",
-      time: "60 dk",
-      players: "2–6 oyuncu",
-      stars: "★★★★☆",
-    },
-    {
-      icon: "🚀",
-      tag: "Yeni",
-      title: "Uzay İstasyonu",
-      image: "/src/assets/uzay-istasyonu.png",
-      time: "75 dk",
-      players: "3–8 oyuncu",
-      stars: "★★★★★",
-    },
-    {
-      icon: "🌙",
-      tag: "Çok zor",
-      title: "Vampir Şatosu",
-      image: "/src/assets/vampir-satosu.png",
-      time: "90 dk",
-      players: "2–5 oyuncu",
-      stars: "★★★★★",
-    },
-    {
-      icon: "🗺️",
-      tag: "Kolay",
-      title: "Kayıp Hazine",
-      image: "/src/assets/kayip-hazine.png",
-      time: "45 dk",
-      players: "2–4 oyuncu",
-      stars: "★★★☆☆",
-    },
-  ];
+  {
+    icon: "🏛️",
+    tag: "En popüler",
+    title: "Müze Cinayeti",
+    image: "/src/assets/muze-cinayeti.png",
+    time: "60 dk",
+    players: "2–6 oyuncu",
+    stars: "★★★★☆",
+    difficulty: "Orta",
+    description:
+      "Ünlü bir koleksiyoncu müzede ölü bulundu. Güvenlik kayıtlarını ve gizli ipuçlarını inceleyerek katili bulmalısınız.",
+  },
+  {
+    icon: "🚀",
+    tag: "Yeni",
+    title: "Uzay İstasyonu",
+    image: "/src/assets/uzay-istasyonu.png",
+    time: "75 dk",
+    players: "3–8 oyuncu",
+    stars: "★★★★★",
+    difficulty: "Zor",
+    description:
+      "Uzay istasyonunun sistemleri arızalandı. Oksijen tükenmeden enerji sistemini onarmalı ve Dünya ile bağlantı kurmalısınız.",
+  },
+  {
+    icon: "🌙",
+    tag: "Çok zor",
+    title: "Vampir Şatosu",
+    image: "/src/assets/vampir-satosu.png",
+    time: "90 dk",
+    players: "2–5 oyuncu",
+    stars: "★★★★★",
+    difficulty: "Çok zor",
+    description:
+      "Terk edilmiş şatoda uyuyan vampir gün batımında uyanacak. Gizli geçidi bulup şatodan zamanında kaçmalısınız.",
+  },
+  {
+    icon: "🗺️",
+    tag: "Kolay",
+    title: "Kayıp Hazine",
+    image: "/src/assets/kayip-hazine.png",
+    time: "45 dk",
+    players: "2–4 oyuncu",
+    stars: "★★★☆☆",
+    difficulty: "Kolay",
+    description:
+      "Eski bir korsan haritasının parçalarını birleştirin, şifreleri çözün ve kayıp hazineye herkesten önce ulaşın.",
+  },
+];
 
   return (
     <>
@@ -120,7 +132,7 @@ function App() {
                   <span className="star-text">{room.stars}</span>
                 </div>
 
-                <button>Detay</button>
+                <button onClick={() => setSelectedRoom(room)}>Detay</button>
               </div>
             ))}
           </div>
@@ -167,7 +179,7 @@ function App() {
 
               <div className="stars">{room.stars}</div>
 
-              <button>Detay →</button>
+              <button onClick={() => setSelectedRoom(room)}>Detay →</button>
             </div>
           ))}
         </div>
@@ -197,7 +209,63 @@ function App() {
           </div>
         </div>
       </section>
+{selectedRoom && (
+  <div
+    className="modal-overlay"
+    onClick={() => setSelectedRoom(null)}
+  >
+    <div
+      className="room-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        className="modal-close"
+        onClick={() => setSelectedRoom(null)}
+        aria-label="Pencereyi kapat"
+      >
+        ×
+      </button>
 
+      <div
+        className="modal-image"
+        style={{ backgroundImage: `url(${selectedRoom.image})` }}
+      />
+
+      <div className="modal-content">
+        <span className="modal-tag">{selectedRoom.tag}</span>
+
+        <h2>{selectedRoom.title}</h2>
+
+        <p className="modal-description">
+          {selectedRoom.description}
+        </p>
+
+        <div className="modal-details">
+          <div>
+            <span>Süre</span>
+            <strong>🕒 {selectedRoom.time}</strong>
+          </div>
+
+          <div>
+            <span>Oyuncu</span>
+            <strong>👥 {selectedRoom.players}</strong>
+          </div>
+
+          <div>
+            <span>Zorluk</span>
+            <strong>{selectedRoom.difficulty}</strong>
+          </div>
+        </div>
+
+        <div className="modal-stars">{selectedRoom.stars}</div>
+
+        <button className="create-room-btn">
+          Bu Odayı Seç
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       <footer>© 2026 Escape Rooms. Tüm hakları saklıdır.</footer>
     </>
   );
