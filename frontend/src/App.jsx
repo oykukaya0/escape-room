@@ -15,6 +15,14 @@ function App() {
   const [copyMessage, setCopyMessage] = useState("");
   const [lobbyData, setLobbyData] = useState(null);
   const [isReady, setIsReady] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("login");
+  const [authName, setAuthName] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   /*joinModalOpen: Katılma penceresini açıp kapatır.
   playerName: Yazılan oyuncu adını tutar.
   roomCode: Yazılan oda kodunu tutar.
@@ -152,6 +160,57 @@ const openLobby = () => {
   setCreateRoom(null);
 };
 
+const openAuthModal = (mode = "login") => {
+  setAuthMode(mode);
+  setAuthModalOpen(true);
+  setAuthName("");
+  setAuthEmail("");
+  setAuthPassword("");
+  setAuthError("");
+};
+
+const handleAuthSubmit = (event) => {
+  event.preventDefault();
+
+  if (authMode === "register" && !authName.trim()) {
+    setAuthError("Lütfen adını gir.");
+    return;
+  }
+
+  if (!authEmail.trim() || !authPassword.trim()) {
+    setAuthError("Lütfen e-posta ve şifre alanlarını doldur.");
+    return;
+  }
+
+  if (!authEmail.includes("@")) {
+    setAuthError("Geçerli bir e-posta adresi gir.");
+    return;
+  }
+
+  if (authPassword.length < 6) {
+    setAuthError("Şifre en az 6 karakter olmalıdır.");
+    return;
+  }
+
+  const displayName =
+    authMode === "register"
+      ? authName.trim()
+      : authEmail.split("@")[0];
+
+  setCurrentUser({
+    name: displayName,
+    email: authEmail,
+  });
+
+  setAuthError("");
+  setAuthModalOpen(false);
+};
+
+const handleLogout = () => {
+  setCurrentUser(null);
+  setUserMenuOpen(false);
+};
+
   return (
     <>
       <nav>
@@ -177,7 +236,51 @@ const openLobby = () => {
         </li>
       </ul>
 
-        <button className="nav-login">Giriş Yap</button>
+        <div className="nav-user-area">
+      {!currentUser ? (
+        <button
+          className="nav-login"
+          onClick={() => openAuthModal("login")}
+        >
+          Giriş Yap
+        </button>
+      ) : (
+        <div className="user-menu-wrapper">
+          <button
+            className="user-menu-button"
+            onClick={() => setUserMenuOpen((prev) => !prev)}
+          >
+            <span className="user-avatar-small">
+              {currentUser.name.charAt(0).toUpperCase()}
+            </span>
+
+            {currentUser.name}
+
+            <span className="menu-arrow">⌄</span>
+          </button>
+
+          {userMenuOpen && (
+            <div className="user-dropdown">
+              <div className="dropdown-user-info">
+                <strong>{currentUser.name}</strong>
+                <span>{currentUser.email}</span>
+              </div>
+
+              <button type="button">Profilim</button>
+              <button type="button">Odalarım</button>
+
+              <button
+                type="button"
+                className="logout-button"
+                onClick={handleLogout}
+              >
+                Çıkış Yap
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+</div>
       </nav>
 
       <main className="hero" id="ana-sayfa">
@@ -678,6 +781,122 @@ const openLobby = () => {
 
         <button disabled>Oyun Yakında</button>
       </section>
+    </div>
+  </div>
+)}
+
+{authModalOpen && (
+  <div
+    className="modal-overlay"
+    onClick={() => setAuthModalOpen(false)}
+  >
+    <div
+      className="auth-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        className="modal-close"
+        onClick={() => setAuthModalOpen(false)}
+        aria-label="Pencereyi kapat"
+      >
+        ×
+      </button>
+
+      <div className="auth-heading">
+        <span>ESCAPE ROOMS</span>
+
+        <h2>
+          {authMode === "login"
+            ? "Tekrar hoş geldin"
+            : "Yeni hesap oluştur"}
+        </h2>
+
+        <p>
+          {authMode === "login"
+            ? "Hesabına giriş yaparak odalarını görüntüle."
+            : "Escape Rooms topluluğuna katıl."}
+        </p>
+      </div>
+
+      <div className="auth-tabs">
+        <button
+          type="button"
+          className={authMode === "login" ? "active" : ""}
+          onClick={() => {
+            setAuthMode("login");
+            setAuthError("");
+          }}
+        >
+          Giriş Yap
+        </button>
+
+        <button
+          type="button"
+          className={authMode === "register" ? "active" : ""}
+          onClick={() => {
+            setAuthMode("register");
+            setAuthError("");
+          }}
+        >
+          Kayıt Ol
+        </button>
+      </div>
+
+      <form className="auth-form" onSubmit={handleAuthSubmit}>
+        {authMode === "register" && (
+          <>
+            <label htmlFor="auth-name">Ad Soyad</label>
+
+            <input
+              id="auth-name"
+              type="text"
+              placeholder="Adını ve soyadını gir"
+              value={authName}
+              onChange={(event) =>
+                setAuthName(event.target.value)
+              }
+            />
+          </>
+        )}
+
+        <label htmlFor="auth-email">E-posta</label>
+
+        <input
+          id="auth-email"
+          type="email"
+          placeholder="ornek@email.com"
+          value={authEmail}
+          onChange={(event) =>
+            setAuthEmail(event.target.value)
+          }
+        />
+
+        <label htmlFor="auth-password">Şifre</label>
+
+        <input
+          id="auth-password"
+          type="password"
+          placeholder="En az 6 karakter"
+          value={authPassword}
+          onChange={(event) =>
+            setAuthPassword(event.target.value)
+          }
+        />
+
+        {authError && (
+          <p className="form-error">{authError}</p>
+        )}
+
+        <button className="auth-submit-button" type="submit">
+          {authMode === "login"
+            ? "Giriş Yap"
+            : "Hesap Oluştur"}
+        </button>
+      </form>
+
+      <p className="auth-demo-note">
+        Bu giriş sistemi şu anda frontend prototipidir.
+      </p>
     </div>
   </div>
 )}
