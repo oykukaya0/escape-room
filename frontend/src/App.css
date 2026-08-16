@@ -54,7 +54,13 @@ nav {
   cursor: pointer;
 }
 
-.nav-links li:hover {
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
   color: white;
 }
 
@@ -738,10 +744,12 @@ footer {
 .hero-title-gold{
     font-family: "Bebas Neue", sans-serif;
 }
-.hero-content{
-    max-width: 720px;
-    margin-top: 40px;
-    margin-right: 550px;   /* Bunu 120-150px yaparak daha da sağa alabilirsin */
+.hero-content {
+  width: 100%;
+  max-width: 720px;
+  margin-top: 40px;
+  margin-right: 0;
+  text-align: left;
 }
 .hero-title{
     line-height: .82;
@@ -770,4 +778,65 @@ footer {
         1px 1px 0 rgba(0,0,0,.45),
         -1px -1px 0 rgba(255,255,255,.03),
         2px 2px 8px rgba(0,0,0,.35);
+}
+
+@media (max-width: 900px) {
+  .hero-title-white,
+  .hero-title-gold {
+    font-size: 64px;
+    letter-spacing: 0;
+  }
+
+  .hero-content {
+    margin-top: 20px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compact .rooms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compact .room-card {
+    height: 240px;
+  }
+
+  .compact .room-card h3 {
+    margin-top: 135px;
+  }
+}
+
+@media (max-width: 500px) {
+  nav {
+    height: 64px;
+    padding: 0 16px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .nav-login {
+    padding: 8px 14px;
+  }
+
+  .hero {
+    padding: 50px 18px 30px;
+  }
+
+  .hero-title-white,
+  .hero-title-gold {
+    font-size: 48px;
+  }
+
+  .hero-content p {
+    font-size: 16px;
+  }
+
+  .stats {
+    margin: 0 18px;
+  }
 }

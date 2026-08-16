@@ -59,16 +59,27 @@ function App() {
         </div>
 
         <ul className="nav-links">
-          <li>Ana Sayfa</li>
-          <li>Odalar</li>
-          <li>Liderlik</li>
-          <li>Nasıl Oynanır</li>
-        </ul>
+        <li>
+          <a href="#ana-sayfa">Ana Sayfa</a>
+        </li>
+
+        <li>
+          <a href="#odalar">Odalar</a>
+        </li>
+
+        <li>
+          <a href="#liderlik">Liderlik</a>
+        </li>
+
+        <li>
+          <a href="#nasil-oynanir">Nasıl Oynanır</a>
+        </li>
+      </ul>
 
         <button className="nav-login">Giriş Yap</button>
       </nav>
 
-      <main className="hero">
+      <main className="hero" id="ana-sayfa">
         <section className="hero-content">
           <h1 className="hero-title">
             <span className="hero-title-white">GİZEMİ ÇÖZ.</span>
@@ -86,7 +97,7 @@ function App() {
           </div>
         </section>
 
-        <section className="rooms-section compact">
+        <section className="rooms-section compact" id="odalar">
           <p className="section-label">🏆 POPÜLER ODALAR</p>
 
           <div className="rooms-grid">
@@ -118,23 +129,25 @@ function App() {
 
       <section className="stats">
         <div>
-          <strong>12+</strong>
-          <p>Benzersiz oda</p>
+          <strong>4</strong>
+          <p>Farklı senaryo</p>
         </div>
+
         <div>
-          <strong>48k</strong>
-          <p>Toplam oyuncu</p>
+          <strong>45–90 dk</strong>
+          <p>Oyun süresi</p>
         </div>
+
         <div>
-          <strong>%34</strong>
-          <p>Kaçış başarı oranı</p>
+          <strong>2–8</strong>
+          <p>Oyuncu kapasitesi</p>
         </div>
+
         <div>
-          <strong>8</strong>
+          <strong>3</strong>
           <p>Zorluk seviyesi</p>
         </div>
       </section>
-
       <section className="rooms-section">
         <p className="section-label">Popüler odalar</p>
         <h2>Hangi gizemi çözeceksin?</h2>
@@ -160,7 +173,7 @@ function App() {
         </div>
       </section>
 
-      <section className="how-section">
+      <section className="how-section" id="nasil-oynanir">
         <p className="section-label">Nasıl oynanır</p>
         <h2>Üç adımda başla</h2>
 
